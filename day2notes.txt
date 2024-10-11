@@ -1,0 +1,169 @@
+Give Everything an ID:
+Each resource(data) available in the server should be identified by a unique ID.
+
+Link Things Together:
+
+There should be one fixed url and from that url all other sub resources should be discoverable and navigatable.
+
+Based on HATEOAS Principle.
+
+HATEOAS------Hypermedia As The Engine Of Application State
+
+Use Standard HTTP methods:
+
+
+Any data should support CRUD operations.
+
+		  RDBMS		REST	
+C----Create-------Insert--------POST //at the end of a post request, a new url should have been created in the server side.
+R----Retrieve-----Select--------GET  //just returns data from an existing url
+U----Update-------Update--------PUT  //data at an existing url, should be modified
+D----Delete-------Delete--------DELETE//at the end of this request, an existing url should have been removed.
+
+
+Support Multiple representations:
+
+A single url should represent data in multiple formats.
+
+GET http://example.com/emp/1001
+Accept: application/json
+
+{
+"id":1001,
+"name":"Surya",
+"designation":"Developer"
+}
+
+
+GET http://example.com/emp/1001
+Accept: application/xml
+
+<employee>
+<id>1001</id>
+<name>Surya</name>
+<designation>Developer</designation>
+</employee>
+
+
+
+Use stateless communication:
+The server should not maintain a conversational state with the client.
+
+ie it should not remember the previous calls of the client.
+
+Everything required to execute a request should be part of that request itself.
+
+
+	   presentation 	     business		integration/dao	       resource/eis		
+client-----controller------------service-----------repository---------------------db
+
+
+different layers in an enterprise app:
+
+client layer------runs within the client as an app or a web page within the browser
+
+presentation layer---generates the content(html,js,json,xml) which is executed by the client
+
+business layer-------contains the business logic------interacting with backend services
+
+integration/dao------data encapsulation----(dao--data access object)
+
+resource/eis---------db/legacy system like mainframe data/another webservice
+
+
+As per the rest principles, the newly created url in the server side should not be decided by the client.
+It should be purely decided by the server.
+
+@RestController-----@Controller + @ResponseBody
+@GetMapping--------@RequestMapping(method=GET)
+@PostMapping--------@RequestMapping(method=POST)
+@PutMapping--------@RequestMapping(method=PUT)
+@DeleteMapping--------@RequestMapping(method=DELETE)
+
+
+Separation Of Concerns----Each layer is responsible for its own set of tasks.
+
+
+
+For a domain class to represent xml, it should be jax-b compliant.
+
+JAX-B----Java api for xml binding.
+
+For a class to be JAX-B compliant,
+
+1. It should be prefixed with @XMLRootElement annotation.
+2. There should be getter/setter methods for the data members
+3. There should be blank constructor.
+
+jaxb-api can both marshal(convert java obj to xml) and unmarshal(convert xml to java obj)
+
+Accept header-----used by the client to inform the server which type of content it prefers-----mostly used by GET requests.
+Content-Type header---used by the client to inform the server which type of content it sends to the server----mostly used by POST / PUT requests.
+
+
+Microservices:
+It is an architectural style where software is composed of small independent services that communicate over well defined apis.
+These services are owned by small, self-contained teams.
+
+Microservices should provide
+
+1. Service Registry---------Registry where microservices are registered with a name.
+The client does not need to know the physical location of the service to access it.
+This principle is also called Location Transparency.
+Spring Boot provides Eureka Server which acts as Service Registry.
+
+2. Externalized Configuration-----The configuration of the microservice should be externalized.
+Spring Boot provides Spring Cloud Config to externalize the configuration.
+
+3. Client Proxy------------Client code should be simple to invoke the service.
+
+
+client--------------proxy of the microservice------------actual micro service.
+
+client does not need to write low level tcp/ip code to interact with the actual service. The low level code is provided by proxy itself.
+
+4. Load Balancing------When there are multiple instances of the same micro service running to support fault tolerance, there should be equal
+balance of load among them.
+
+Spring boot supports client proxy and load balancing through a special component called feign.
+
+5. Common API Gateway:
+
+There are some functionalities which are needed for multiple micro services.
+This includes logging, transaction management, security and etc.
+
+The api gateway can contain this common code and can be shared with multiple components.
+
+Spring Boot  provides Spring Cloud Gateway which acts as an api gateway.
+
+
+
+Item Service:
+
+The input for this service is itemCode.
+The output from this service is itemName and price.
+This will be registered in the eureka server.
+
+
+Eureka server itself is a spring boot component.
+It itself runs in tomcat.
+
+
+Item Order Service:
+
+The input for this service is itemCode and quantity.
+The output from this services is itemName and totalPrice. 
+This fill fetch the itemName and price from ItemService through the feign proxy.
+This service also will be registered in the eureka server.
+
+
+						1
+					   looks up for item-micro-service
+					 |--------------------------------->Eureka Server
+client-------------item-order-service----|<---------------------------------|
+				|	    proxy of item-micro-service			  
+				|		2
+			       3| interacts with proxy of item-micro-service
+				|
+				|----------------------item-micro-service
+

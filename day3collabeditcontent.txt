@@ -1,0 +1,524 @@
+https://drive.google.com/drive/folders/1S8ZemPGq03_smqgFzdWPSwWus6g6FfhQ?usp=sharing
+
+
+package com.bofa.training.itemservice.domain;
+
+public class Item {
+    private int itemCode;
+    private String itemName;
+    private double price;
+    private int port;
+    
+    
+    public int getPort() {
+        return port;
+    }
+    public void setPort(int port) {
+        this.port = port;
+    }
+    public int getItemCode() {
+        return itemCode;
+    }
+    public void setItemCode(int itemCode) {
+        this.itemCode = itemCode;
+    }
+    public String getItemName() {
+        return itemName;
+    }
+    public void setItemName(String itemName) {
+        this.itemName = itemName;
+    }
+    public double getPrice() {
+        return price;
+    }
+    public void setPrice(double price) {
+        this.price = price;
+    }
+    public Item(int itemCode, String itemName, double price) {
+        super();
+        this.itemCode = itemCode;
+        this.itemName = itemName;
+        this.price = price;
+    }
+    public Item() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+    
+    
+
+}
+
+
+
+package com.bofa.training.itemservice.service;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Service;
+
+import com.bofa.training.itemservice.domain.Item;
+
+@Service
+public class ItemService {
+    private Map<Integer, Item> list=new HashMap<>();
+
+    @Autowired
+    private Environment env;
+    public ItemService() {
+        super();
+        // TODO Auto-generated constructor stub
+        list.put(1001, new Item(1001, "Apple", 200));
+        list.put(1002, new Item(1002, "Orange", 100));
+        list.put(1003, new Item(1003, "Mango", 400));
+    }
+
+    public Item findItem(int code) {
+        Item item= list.get(code);
+        int port=Integer.parseInt(env.getProperty("local.server.port"));
+        item.setPort(port);
+        return item;
+    }
+    
+}
+
+
+package com.bofa.training.itemorderservice.domain;
+
+public class ItemOrder {
+    private int itemCode;
+    private String itemName;
+    private double totalAmount;
+    private int port;
+    
+    public ItemOrder(int itemCode, String itemName, double totalAmount) {
+        super();
+        this.itemCode = itemCode;
+        this.itemName = itemName;
+        this.totalAmount = totalAmount;
+    }
+    public ItemOrder() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+    public int getItemCode() {
+        return itemCode;
+    }
+    public void setItemCode(int itemCode) {
+        this.itemCode = itemCode;
+    }
+    
+    public String getItemName() {
+        return itemName;
+    }
+    public void setItemName(String itemName) {
+        this.itemName = itemName;
+    }
+    public double getTotalAmount() {
+        return totalAmount;
+    }
+    public void setTotalAmount(double totalAmount) {
+        this.totalAmount = totalAmount;
+    }
+    public int getPort() {
+        return port;
+    }
+    public void setPort(int port) {
+        this.port = port;
+    }
+
+    
+    
+}
+
+
+package com.bofa.training.itemorderservice.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.bofa.training.itemorderservice.domain.Item;
+import com.bofa.training.itemorderservice.domain.ItemOrder;
+import com.bofa.training.itemorderservice.proxy.ItemProxy;
+
+@Service
+public class ItemOrderService {
+
+    @Autowired
+    private ItemProxy proxy;
+    
+    public ItemOrder getOrderDetails(int code,int quantity) {
+        Item item=proxy.getItemDetails(code);
+        ItemOrder order=new ItemOrder(code, item.getItemName(), item.getPrice()*quantity);
+        order.setPort(item.getPort());
+        return order;
+    }
+}
+
+
+-Dserver.port=8002
+
+http://localhost:9001/itemorder/1001/3
+
+http://localhost:8001/item/1003
+
+http://localhost:8002/item/1003
+
+http://localhost:8003/item/1003
+
+package com.bofa.training.firstservice.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/first")
+public class FirstController {
+    @GetMapping("/data")
+    public String getData()
+    {
+        return "Data from first service";
+    }
+
+}
+
+
+eureka.client.service-url.defaultZone=http://localhost:8000/eureka
+
+application.properties of second-service
+
+spring.application.name=second-service
+server.port=7002
+eureka.client.service-url.defaultZone=http://localhost:8000/eureka
+
+
+package com.bofa.training.secondservice.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/second")
+public class SecondController {
+    @GetMapping("/data")
+    public String getData()
+    {
+        return "Data from second service";
+    }
+
+}
+
+package com.bofa.training.thirdservice.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/third")
+public class ThirdController {
+    @GetMapping("/data")
+    public String getData()
+    {
+        return "Data from third service";
+    }
+
+}
+
+
+application.properties of third-service
+
+spring.application.name=third-service
+server.port=7003
+eureka.client.service-url.defaultZone=http://localhost:8000/eureka
+
+application.properties for api gateway
+
+#application name in eureka
+spring.application.name=logging-api-gateway
+server.port=7051
+#enabling the gateway router
+spring.cloud.gateway.discovery.locator.enabled=true
+#defining the router for first-service
+spring.cloud.gateway.routes[0].id=first
+#defining suburl within the first-service
+spring.cloud.gateway.routes[0].predicates[0]=Path=/first/**
+spring.cloud.gateway.routes[0].predicates[1]=Method=GET
+#identifying the service from eureka
+spring.cloud.gateway.routes[0].uri=lb://FIRST-SERVICE
+
+spring.cloud.gateway.routes[1].id=second
+spring.cloud.gateway.routes[1].predicates[0]=Path=/second/**
+spring.cloud.gateway.routes[1].predicates[1]=Method=GET
+spring.cloud.gateway.routes[1].uri=lb://SECOND-SERVICE
+
+spring.cloud.gateway.routes[2].id=third
+spring.cloud.gateway.routes[2].predicates[0]=Path=/third/**
+spring.cloud.gateway.routes[2].predicates[1]=Method=GET
+spring.cloud.gateway.routes[2].uri=lb://THIRD-SERVICE
+
+#eureka server to which api gateway is registered#
+eureka.client.service-url.defaultZone=http://localhost:8000/eureka
+
+
+package com.bofa.training.loggingapigateway.filter;
+
+import java.util.Date;
+
+import org.springframework.cloud.gateway.filter.GlobalFilter;
+import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Component;
+
+import reactor.core.publisher.Mono;
+
+@Component
+public class LoggingFilter {
+
+    @Bean
+    public GlobalFilter addLog() {
+        return (exchange,chain)->{
+            String uri=exchange.getRequest().getURI().toString();
+            System.out.println("pre-filter before forwading to "+uri+" "+new Date());
+            return chain.filter(exchange).then(Mono.fromRunnable(()->{
+                System.out.println("post-filter after invoking "+uri+" "+new Date());
+            }));
+        };
+    }
+}
+
+
+without api gateway
+
+http://localhost:7001/first/data
+http://localhost:7002/second/data
+http://localhost:7003/third/data
+
+
+
+with api gateway
+
+http://localhost:7051/first/data
+http://localhost:7051/second/data
+http://localhost:7051/third/data
+
+https://github.com/git-for-windows/git/releases/download/v2.47.0.windows.1/Git-2.47.0-64-bit.exe
+
+
+$ mkdir c:/gitrepo
+
+
+$ cd c:/gitrepo
+
+
+$ git init
+
+
+application.properties of spring cloud config server
+
+spring.application.name=spring-cloud-config
+server.port=7101
+spring.cloud.config.server.git.uri=file://c:/gitrepo
+
+
+package com.bofa.training.cloudconfig;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.config.server.EnableConfigServer;
+
+@SpringBootApplication
+@EnableConfigServer
+public class SpringCloudConfigApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(SpringCloudConfigApplication.class, args);
+    }
+
+}
+
+
+package com.bofa.training.numberservice.domain;
+
+public class Number {
+    private int min;
+    private int max;
+    public Number() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+    public Number(int min, int max) {
+        super();
+        this.min = min;
+        this.max = max;
+    }
+    public int getMin() {
+        return min;
+    }
+    public void setMin(int min) {
+        this.min = min;
+    }
+    public int getMax() {
+        return max;
+    }
+    public void setMax(int max) {
+        this.max = max;
+    }
+    
+    
+
+}
+
+
+package com.bofa.training.numberservice.config;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
+
+@Component
+//the configuration will be passed through numberservice.properties file
+@ConfigurationProperties("numberservice")
+public class NumberConfiguration {
+    private int minimum;
+    private int maximum;
+    public NumberConfiguration(int minimum, int maximum) {
+        super();
+        this.minimum = minimum;
+        this.maximum = maximum;
+    }
+    public NumberConfiguration() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+    public int getMinimum() {
+        return minimum;
+    }
+    public void setMinimum(int minimum) {
+        this.minimum = minimum;
+    }
+    public int getMaximum() {
+        return maximum;
+    }
+    public void setMaximum(int maximum) {
+        this.maximum = maximum;
+    }
+    
+    
+}
+
+
+package com.bofa.training.numberservice.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.bofa.training.numberservice.config.NumberConfiguration;
+import com.bofa.training.numberservice.domain.Number;
+@Service
+public class NumberService {
+    
+    @Autowired
+    private NumberConfiguration configuration;
+    
+    public Number getNumber() {
+        return new Number(configuration.getMinimum(), configuration.getMaximum());
+    }
+
+}
+
+
+package com.bofa.training.numberservice.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.bofa.training.numberservice.domain.Number;
+import com.bofa.training.numberservice.service.NumberService;
+
+@RestController
+@RequestMapping("/number")
+public class NumberController {
+    @Autowired
+    private NumberService service;
+    @GetMapping(path="/test",produces = MediaType.APPLICATION_JSON_VALUE)
+    public Number getNumber() {
+        return service.getNumber();
+    }
+}
+
+c:/gitrepo/numberservice.properties
+
+numberservice.minimum=1
+numberservice.maximum=100
+
+application.properties of number-service-config-client
+
+spring.application.name=number-service-config-client
+server.port=7102
+spring.config.import=configserver:http://localhost:7101
+
+
+
+$ cat numberservice.properties
+numberservice.minimum=1
+numberservice.maximum=100
+Administrator@DESKTOP-TIC5DM4 MINGW64 /c/gitrepo (master)
+$ git add numberservice.properties
+
+Administrator@DESKTOP-TIC5DM4 MINGW64 /c/gitrepo (master)
+
+$ git config --global user.name "subramanian"
+
+$ git config --global user.email "subramanian@rpsconsulting.in"
+
+
+$ git commit -a -m "first commit"
+
+
+
+spring.cloud.config.server.git.default-label=master
+
+http://localhost:7102/number/test
+
+$ cd c:/gitrepo
+
+
+$ git add numberservice-dev.properties
+
+$ git add numberservice-prod.properties numberservice-qa.properties
+
+
+$ git commit -a -m "second commit"
+
+spring.profiles.active=qa
+
+http://localhost:7102/number/test
+
+
+-Dserver.port=7103 -Dspring.profiles.active=dev
+
+http://localhost:7103/number/test
+
+
+-Dserver.port=7104 -Dspring.profiles.active=prod
+
+http://localhost:7104/number/test
+
+-Dserver.port=7105 -Dspring.profiles.active=
+
+$ git commit -a -m "third commit" 
+
+https://archive.apache.org/dist/kafka/2.5.0/kafka_2.12-2.5.0.tgz
+
+bin\windows\zookeeper-server-start.bat config\zookeeper.properties
+
+bin\windows\kafka-server-start.bat config\server.properties
+
+

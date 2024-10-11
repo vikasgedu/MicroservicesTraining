@@ -1,0 +1,89 @@
+Load Balancing:
+
+Server side load balancing:
+							   |-----serv-1
+client------------------->Server Side Load Balancer--------|-----serv-2
+							   |-----serv-3	
+
+The server side load balancer decides to which server a particular request must be directed based on some algorithm like round robin, weighted and etc.
+
+	  |----------serv-1
+client----|----------serv-2
+	  |----------serv-3
+client maintains the load balancing strategy.
+
+In spring boot, feign proxy can act as a client side load balancer.
+
+
+
+				       |-----item-micro-service:8001	
+client-----------feign-proxy-----------|-----item-micro-service:8002
+				       |-----item-micro-service:8003	
+
+
+Advantages of load balancing:
+
+1. No single point of failure.
+2. Better availability
+3. Better scalability
+4. Less network latency
+
+
+java vm-arguments className  command-line-arguments
+
+vm-argument -DsystemProperty=value
+
+server.port system property overrides the application property server.port
+
+API Gateway:
+
+It is used to provide a common gateway to multiple microservices.
+
+There are some responsibilities which are common to multiple services like logging, transaction management, security and etc.
+
+Instead of duplicating these logics in all the services, you can have each of these logics in a single 
+place and make the services to access the common logic through a common point. This common point is called api gateway.
+
+				  |------micro-service-1
+client----------api gateway-------|------micro-service-2
+				  |------micro-service-3
+
+zuul api gateway------gateway used in spring boot 1 and 2.
+
+from spring boot 3, zuul api gateway is replaced with spring cloud api gateway.
+
+3 Building blocks of spring cloud api gateway.
+
+1. Route--------basic building block----consists of an id, destination URI, collection of predicates and filters.
+2. Predicate----used to match http request urls, parameters and http methods
+3. Filter-------we can moadify the request or response as per the requirement 
+	
+Externalized Configuration:
+
+spring boot lets you externalize your configuration so that the same microservice can run in 
+different environments.
+
+
+spring cloud config is used to externalize the configuration.
+The external resource can be a git repository which contains the configs needed by the microservice.
+
+We need a MOM(Message Oriented Middleware) to update this information.
+
+Spring cloud provides a bus called spring cloud bus which picks up the information from the git repository and updates it in the config server.
+
+This bus is enabled through an MOM and spring actuator.
+
+MOM is also called a messaging server.
+Examples of messaging servers are IBM MQ, Apache Active MQ, Kafka, Rabbit MQ and etc.
+
+Spring Actuator is a tool provided by spring boot to monitor an app, gather metrics, notify some events and etc.
+
+For this example, we shall use kafka as the messaging server.
+
+
+
+
+
+
+
+
