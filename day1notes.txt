@@ -1,0 +1,236 @@
+Standalone Application: Single User app
+Enterprise Application: Multi User app
+
+
+Standalone application + Middleware services = Multi User application.
+
+
+Examples of Middleware services:
+
+Life cycle management of objects
+Multi threading
+Security
+Transaction Management
+Connection Pooling
+Networking
+
+In java EE, these middleware services are provided by external application servers.
+But when we use spring, we do not need an external application server.
+
+Since it does not need an application server, it more light weight than java EE.
+
+
+Life cycle management------Dependency Injection:
+
+By default, the life cycle management of objects is taken care by the developer.
+
+class X{
+}
+
+X x1=new X();
+
+Dependency Injection:
+
+If one object depends on having an instance of another object, the needed is instantiated and injected into 
+the dependent object automatically.
+
+class Address{
+	private String location;
+	private String city;
+
+	........
+
+}
+
+class Customer{
+	private int id;
+	private String name;
+	private Address address;
+}
+
+without spring framework,
+
+Customer c=new Customer();
+Address a=new Address();
+c.setAddress(a);
+
+
+with spring framework,
+
+the explicit assigning of address object is not required. It can be achieved with @Autowired annotation.
+
+@Component
+class Customer{
+	private int id;
+	private String name;
+	@Autowired
+	private Address address;
+}
+@Component
+class Address{
+}
+
+Dependency Injection is also called Inversion of Control(IoC).
+
+Control-------top down approach
+Inversion Of Control----Bottom up approach.
+
+If customer needs address, address is initialized first and then the customer.
+
+ie the needed objects are instantiated first and then the dependent object.
+
+Ioc Container:
+
+Container where objects of spring bean classes are created and injected.
+For a normal class to be treated as spring bean , it should be prefixed with @Component annotation.
+
+
+
+Maven is a java based tool which is very commonly used for managing external dependencies, building and packaging the java applications.
+
+A maven project contains a config file called pom.xml.
+
+we add external libraries through dependencies.
+Each dependency has 3 attributes.
+
+group-id------------company/project name
+artifact-id---------library name
+version-------------version
+
+In java community form, there is a common agreement that all open source libraries are hosted at http://mvnrepository.com. 
+
+Each dependency represents a library.
+
+When we add the dependency in pom.xml and build it, it is downloaded from global repository(http://mvnrepository.com) to local repository(~/.m2/repository).
+
+~---user's home directory.
+
+The name of the jar file will be artifactid-version.jar
+
+spring bean config file:
+
+In the earlier versions of spring, the config is an xml.
+In the later versions, the config file is a java class and the settings are specified through annotations.
+
+@Configuration------used to denote current java class is spring bean config file.
+@ComponentScan------used to specify the packages where components will be scanned.
+Any class which is prefixed with @Component is identified as a spring bean.
+
+
+@Bean:
+It is used to indicate that a method instantiates, configures and initializes a new object to be managed by 
+the IoC container.
+
+Spring Tool Suite= Eclipse + Spring IDE plugins
+
+Spring Boot:
+
+It helps developers to create applications that just run.
+
+It lets you create applications that run on their own, without relying on any external webserver by embedding
+web servers like tomcat into your app during the initialization process.
+
+@SpringBootApplication annotation is equivalent to 3 more additional annotations.
+
+@Configuration-------acts as a config class
+@EnableAutoConfiguration-----Tells spring boot to add beans based on the classpath settings.
+@ComponentScan---------------enables component scanning for sub packages.
+
+application.properties 
+
+This is file used to configure application specific properties.
+
+yaml -----yet another markup language
+
+
+spring.application.name=test
+spring.application.fetch-registry=false
+
+spring:
+  application:
+	  name:test
+	  fetch-registry:false
+	
+spring boot developer tools dependency:
+
+It will restart the application whenever we make change.
+
+
+JPA-----Java Persistence API.
+
+
+Specification for ORM tools.
+
+ORM------Object Relational Mapping tool.
+
+These object relational mapping tools provide the object oriented view data.
+
+
+an rdbms table can be mapped to a java class.
+
+
+employee table with columns id(int),name(varchar) and designation(varchar) can be mapped to a following java 
+class.
+
+class Employee{
+	private int id;
+	private String name;
+	private String designation;
+.........
+
+}
+
+Each object of this class represents one row in the table.
+
+Examples of ORM tools:
+
+Hibernate
+EclipseLink
+Kodo
+
+JPA provides a high level api on top this ORM tools.
+
+Domain/Entity class represents the table.
+
+should be prefixed with @Entity annotation.
+optionally prefixed with @Table annotation if the table is different from the entity class name.
+
+The field which represents the primary key should be prefixed with @Id annotation.
+
+It is mandatory that for orm mapping, the table should have a primary key.
+
+Spring boot provides a JPARepository interface which contains basic CRUD methods to interact with RDBMS.
+
+Restful webservices:
+
+Webservices----Collection of encapsulated functions accessed over internet.
+Each webpage has an url which we access through the browser.
+Each service (functionality) is identified by an url, which is called a webservice.
+Technically webservices provides platform interoperability.
+
+For example , a service written in java can be invoked by a python client.
+
+REST is a special webservices which exposes only data.
+REST----Representational State Transfer.
+
+It transfers the state of data between the client and server.
+
+Two types of webservices.
+
+1. SOAP-----exposes functionality---examples---start/stop a server, start a scheduler
+2. REST-----exposes data------------examples---CRUD operations.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

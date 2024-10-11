@@ -1,0 +1,855 @@
+<dependencies>
+  <!-- https://mvnrepository.com/artifact/org.springframework/spring-core -->
+<dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-core</artifactId>
+    <version>5.2.0.RELEASE</version>
+</dependency>
+
+<!-- https://mvnrepository.com/artifact/org.springframework/spring-context -->
+<dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-context</artifactId>
+    <version>5.2.0.RELEASE</version>
+</dependency>
+
+  </dependencies>
+  
+  package com.bofa.training.beans;
+
+import org.springframework.stereotype.Component;
+
+@Component
+public class Customer {
+    private int id=1001;
+    private String name="Arvind";
+    public int getId() {
+        return id;
+    }
+    public void setId(int id) {
+        this.id = id;
+    }
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+    
+    
+    
+
+}
+
+
+package com.bofa.training.config;
+
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+@ComponentScan(basePackages = "com.bofa.training.beans")
+public class BeanConfig {
+    
+}
+
+
+package com.bofa.training.test;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import com.bofa.training.beans.Customer;
+import com.bofa.training.config.BeanConfig;
+
+public class DITest1 {
+
+    public static void main(String[] args) {
+        // TODO Auto-generated method stub
+        ApplicationContext context=new AnnotationConfigApplicationContext(BeanConfig.class);
+        Customer customer=context.getBean(Customer.class);
+        System.out.println(customer.getId()+"\t"+customer.getName());
+
+       
+
+}
+
+}
+
+resource/testbeans.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="cust" class="com.bofa.training.beans.Customer"></bean>
+
+</beans>
+
+
+
+package com.bofa.training.test;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import com.bofa.training.beans.Customer;
+import com.bofa.training.config.BeanConfig;
+
+public class DITest2 {
+
+    public static void main(String[] args) {
+        // TODO Auto-generated method stub
+        
+        //creates the ioc container and instantiates the beans
+        ApplicationContext context=new ClassPathXmlApplicationContext("testbeans.xml");
+        Customer customer=context.getBean(Customer.class);
+        System.out.println(customer.getId()+"\t"+customer.getName());
+
+    }
+
+}
+
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="cust1" class="com.bofa.training.beans.Customer">
+    <property name="id" value="5001"></property>
+    <property name="name" value="Surya"></property>
+    </bean>
+ <bean id="cust2" class="com.bofa.training.beans.Customer">
+    <property name="id" value="5002"></property>
+    <property name="name" value="Akash"></property>
+    </bean>
+</beans>
+
+package com.bofa.training.test;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import com.bofa.training.beans.Customer;
+import com.bofa.training.config.BeanConfig;
+
+public class DITest3 {
+
+    public static void main(String[] args) {
+        // TODO Auto-generated method stub
+        
+        //creates the ioc container and instantiates the beans
+        ApplicationContext context=new ClassPathXmlApplicationContext("testbeans.xml");
+        Customer customer=(Customer) context.getBean("cust1");
+        System.out.println(customer.getId()+"\t"+customer.getName());
+        customer=(Customer) context.getBean("cust2");
+        System.out.println(customer.getId()+"\t"+customer.getName());
+
+    }
+
+}
+
+
+
+package com.bofa.training.beans;
+
+import org.springframework.stereotype.Component;
+
+@Component("cust3")
+public class Customer {
+    private int id=1001;
+    private String name="Arvind";
+    public int getId() {
+        return id;
+    }
+    public void setId(int id) {
+        this.id = id;
+    }
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+    
+    
+    
+
+}
+
+
+secondbeans.xml
+
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        https://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:component-scan base-package="com.bofa.training.beans"/>
+<bean id="cust1" class="com.bofa.training.beans.Customer">
+    <property name="id" value="5001"></property>
+    <property name="name" value="Surya"></property>
+    </bean>
+ <bean id="cust2" class="com.bofa.training.beans.Customer">
+    <property name="id" value="5002"></property>
+    <property name="name" value="Akash"></property>
+    </bean>
+</beans>
+
+
+package com.bofa.training.test;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import com.bofa.training.beans.Customer;
+import com.bofa.training.config.BeanConfig;
+
+public class DITest4 {
+
+    public static void main(String[] args) {
+        // TODO Auto-generated method stub
+        
+        //creates the ioc container and instantiates the beans
+        ApplicationContext context=new ClassPathXmlApplicationContext("secondbeans.xml");
+        Customer customer=(Customer) context.getBean("cust1");
+        System.out.println(customer.getId()+"\t"+customer.getName());
+        customer=(Customer) context.getBean("cust2");
+        System.out.println(customer.getId()+"\t"+customer.getName());
+        customer=(Customer) context.getBean("cust3");
+        System.out.println(customer.getId()+"\t"+customer.getName());
+
+    }
+
+}
+
+thirdbeans.xml
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        https://www.springframework.org/schema/context/spring-context.xsd">
+
+    
+<bean id="cust1" class="com.bofa.training.beans.Customer">
+    <property name="id" value="5001"></property>
+    <property name="name" value="Surya"></property>
+    </bean>
+ <bean id="cust2" class="com.bofa.training.beans.Customer">
+    <property name="id" value="5002"></property>
+    <property name="name" value="Akash"></property>
+    </bean>
+</beans>
+
+
+package com.bofa.training.config;
+
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.ImportResource;
+
+@Configuration
+@ImportResource("classpath*:thirdbeans.xml")
+@ComponentScan(basePackages = "com.bofa.training.beans")
+public class SecondConfig {
+    
+}
+
+
+package com.bofa.training.test;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import com.bofa.training.beans.Customer;
+import com.bofa.training.config.BeanConfig;
+import com.bofa.training.config.SecondConfig;
+
+public class DITest5 {
+
+    public static void main(String[] args) {
+        // TODO Auto-generated method stub
+        
+        //creates the ioc container and instantiates the beans
+        ApplicationContext context=new AnnotationConfigApplicationContext(SecondConfig.class);
+        Customer customer=(Customer) context.getBean("cust1");
+        System.out.println(customer.getId()+"\t"+customer.getName());
+        customer=(Customer) context.getBean("cust2");
+        System.out.println(customer.getId()+"\t"+customer.getName());
+        customer=(Customer) context.getBean("cust3");
+        System.out.println(customer.getId()+"\t"+customer.getName());
+
+        public static void main(String[] args) {
+        // TODO Auto-generated method stub
+        
+        //creates the ioc container and instantiates the beans
+        ApplicationContext context=new AnnotationConfigApplicationContext(SecondConfig.class);
+        Customer customer=(Customer) context.getBean("cust1");
+        System.out.println(customer.getId()+"\t"+customer.getName());
+        customer=(Customer) context.getBean("cust2");
+        System.out.println(customer.getId()+"\t"+customer.getName());
+        customer=(Customer) context.getBean("cust3");
+        System.out.println(customer.getId()+"\t"+customer.getName());
+
+    }
+
+}
+
+
+
+package com.bofa.training.beans.autowiring;
+
+
+public class Address {
+    private String location;
+    private String city;
+    public String getLocation() {
+        return location;
+    }
+    public void setLocation(String location) {
+        this.location = location;
+    }
+    public String getCity() {
+        return city;
+    }
+    public void setCity(String city) {
+        this.city = city;
+    }
+    public Address(String location, String city) {
+        super();
+        this.location = location;
+        this.city = city;
+    }
+    public Address() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+    
+    
+
+}
+
+
+package com.bofa.training.beans.autowiring;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+
+public class Customer {
+    private int id;
+    private String name;
+    @Autowired
+    private Address address;
+    public int getId() {
+        return id;
+    }
+    public void setId(int id) {
+        this.id = id;
+    }
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+    public Address getAddress() {
+        return address;
+    }
+    public void setAddress(Address address) {
+        this.address = address;
+    }
+    public Customer(int id, String name, Address address) {
+        super();
+        this.id = id;
+        this.name = name;
+        this.address = address;
+    }
+    public Customer() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+    
+    
+    
+
+}
+
+
+
+
+package com.bofa.training.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import com.bofa.training.beans.autowiring.Address;
+import com.bofa.training.beans.autowiring.Customer;
+
+
+@Configuration
+public class ThirdConfig {
+
+    @Bean("cust")
+    public Customer getCustomer() {
+        Customer customer=new Customer();
+        customer.setId(9001);
+        customer.setName("Arjun");
+        return customer;
+    }
+    @Bean
+    public Address getAddress() {
+        return new Address("Hebbal", "Bangalore");
+    }
+    
+}
+
+
+
+
+package com.bofa.training.test;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import com.bofa.training.beans.autowiring.Address;
+import com.bofa.training.beans.autowiring.Customer;
+import com.bofa.training.config.ThirdConfig;
+
+public class DITest6 {
+
+    public static void main(String[] args) {
+        // TODO Auto-generated method stub
+        
+        //creates the ioc container and instantiates the beans
+        ApplicationContext context=new AnnotationConfigApplicationContext(ThirdConfig.class);
+        Customer customer=(Customer) context.getBean("cust");
+        Address address=customer.getAddress();
+        System.out.println(customer.getId()+"\t"+customer.getName());
+        System.out.println(address.getLocation()+"\t"+address.getCity());
+
+    }
+
+}
+
+
+package com.bofa.training.test;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import com.bofa.training.beans.autowiring.Address;
+import com.bofa.training.beans.autowiring.Customer;
+import com.bofa.training.config.ThirdConfig;
+
+public class DITest6 {
+
+    public static void main(String[] args) {
+        // TODO Auto-generated method stub
+        
+        //creates the ioc container and instantiates the beans
+        ApplicationContext context=new AnnotationConfigApplicationContext(ThirdConfig.class);
+        Customer customer=(Customer) context.getBean("cust");
+        Address address=customer.getAddress();
+        System.out.println(customer.getId()+"\t"+customer.getName());
+        System.out.println(address.getLocation()+"\t"+address.getCity());
+        
+        Address address2=(Address)context.getBean("getAddress");
+        System.out.println(address2.getLocation()+"\t"+address2.getCity());
+
+    }
+
+}
+
+
+package com.bofa.training.test;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import com.bofa.training.beans.autowiring.Address;
+import com.bofa.training.beans.autowiring.Customer;
+import com.bofa.training.config.ThirdConfig;
+
+public class DITest6 {
+
+    public static void main(String[] args) {
+        // TODO Auto-generated method stub
+        
+        //creates the ioc container and instantiates the beans
+        ApplicationContext context=new AnnotationConfigApplicationContext(ThirdConfig.class);
+        System.out.println("IOC container initialized");
+        Customer customer=(Customer) context.getBean("cust");
+        Address address=customer.getAddress();
+        System.out.println(customer.getId()+"\t"+customer.getName());
+        System.out.println(address.getLocation()+"\t"+address.getCity());
+        
+        Address address2=(Address)context.getBean("getAddress");
+        System.out.println(address2.getLocation()+"\t"+address2.getCity());
+
+    }
+
+}
+
+
+package com.bofa.training.beans.collections;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+
+
+public class Customer {
+    private int id;
+    private String name;
+    @Autowired
+    private List<Address> addresses;
+    public int getId() {
+        return id;
+    }
+    public void setId(int id) {
+        this.id = id;
+    }
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+    
+    public Customer() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+    public Customer(int id, String name) {
+        super();
+        this.id = id;
+        this.name = name;
+    }
+    public List<Address> getAddresses() {
+        return addresses;
+    }
+    public void setAddresses(List<Address> addresses) {
+        this.addresses = addresses;
+    }
+    
+    
+    
+
+}
+
+
+package com.bofa.training.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import com.bofa.training.beans.collections.Address;
+import com.bofa.training.beans.collections.Customer;
+
+
+
+@Configuration
+public class FourthConfig {
+
+    @Bean("cust")
+    public Customer getCustomer() {
+        return new Customer(8001,"Rakesh");
+    }
+    @Bean
+    public Address getAddress1() {
+        
+        return new Address("Hebbal", "Bangalore");
+    }
+    @Bean
+    public Address getAddress2() {
+        
+        return new Address("Hinjewadi", "Pune");
+    }
+    @Bean
+    public Address getAddress3() {
+        
+        return new Address("Panjakutta", "Hyderabad");
+    }
+    
+        
+}
+
+
+
+
+package com.bofa.training.test;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import com.bofa.training.beans.collections.Address;
+import com.bofa.training.beans.collections.Customer;
+import com.bofa.training.config.FourthConfig;
+
+
+
+public class DITest7 {
+
+    public static void main(String[] args) {
+        // TODO Auto-generated method stub
+        
+        //creates the ioc container and instantiates the beans
+        ApplicationContext context=new AnnotationConfigApplicationContext(FourthConfig.class);
+        System.out.println("IOC container initialized");
+        Customer customer=(Customer) context.getBean("cust");
+        
+        System.out.println(customer.getId()+"\t"+customer.getName());
+        for(Address address:customer.getAddresses()) {
+            System.out.println(address.getLocation()+"\t"+address.getCity());
+        }
+    }
+
+}
+
+
+
+package com.bofa.training.beans.collections;
+
+
+public class Address {
+    private String location;
+    private String city;
+    public String getLocation() {
+        return location;
+    }
+    public void setLocation(String location) {
+        this.location = location;
+    }
+    public String getCity() {
+        return city;
+    }
+    public void setCity(String city) {
+        this.city = city;
+    }
+    public Address(String location, String city) {
+        super();
+        this.location = location;
+        this.city = city;
+    }
+    public Address() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+    
+        private String location;
+    private String city;
+    public String getLocation() {
+        return location;
+    }
+    public void setLocation(String location) {
+        this.location = location;
+    }
+    public String getCity() {
+        return city;
+    }
+    public void setCity(String city) {
+        this.city = city;
+    }
+    public Address(String location, String city) {
+        super();
+        this.location = location;
+        this.city = city;
+    }
+    public Address() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+    
+    
+
+}
+
+
+package com.bofa.training.controllers;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+@Controller
+@RequestMapping("/test")
+public class FirstController {
+    @RequestMapping("/msg")
+    public @ResponseBody String simpleResponse() {
+        return "<html><body><h2>Welcome to Spring Boot</h2></body></html>";
+    }
+}
+
+
+http://localhost:8080/test/msg
+
+package com.bofa.training.controllers;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+@Controller
+@RequestMapping("/second")
+public class SecondController {
+    @RequestMapping("/msg")
+    public @ResponseBody String simpleResponse() {
+        return "<html><body><h2>This is second controller</h2></body></html>";
+    }
+}
+
+
+https://start.spring.io/
+
+mysql password: rps@12345
+
+mysql> create database trainingdb;
+Query OK, 1 row affected (0.00 sec)
+
+mysql> show databases;
+
+    <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
+<dependency>
+    <groupId>mysql</groupId>
+    <artifactId>mysql-connector-java</artifactId>
+    <version>5.1.31</version>
+</dependency>
+
+
+spring.application.name=jpa-test
+spring.datasource.url=jdbc:mysql://localhost:3306/trainingdb
+spring.datasource.username=root
+spring.datasource.password=rps@12345
+spring.datasource.driver-class-name=com.mysql.jdbc.Driver
+spring.jpa.hibernate.ddl-auto=update
+
+
+
+
+package com.bofa.training.domain;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+
+@Entity
+public class Employee {
+
+    @Id
+    private int id;
+    private String name;
+    private String designation;
+    public Employee(int id, String name, String designation) {
+        super();
+        this.id = id;
+        this.name = name;
+        this.designation = designation;
+    }
+    public Employee() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+    public int getId() {
+        return id;
+    }
+    public void setId(int id) {
+        this.id = id;
+    }
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+    public String getDesignation() {
+        return designation;
+    }
+    public void setDesignation(String designation) {
+        this.designation = designation;
+    }
+    
+    
+    
+    
+}
+
+package com.bofa.training.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import com.bofa.training.domain.Employee;
+
+@Repository
+public interface EmployeeRepository  extends JpaRepository<Employee, Integer>{
+
+}
+
+
+
+package com.bofa.training;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import com.bofa.training.domain.Employee;
+import com.bofa.training.repository.EmployeeRepository;
+
+@SpringBootApplication
+public class JpaTestApplication implements CommandLineRunner{
+    @Autowired
+    private EmployeeRepository repository;
+
+    public static void main(String[] args) {
+        SpringApplication.run(JpaTestApplication.class, args);
+    }
+
+    @Override
+    public void run(String... args) throws Exception {
+        // TODO Auto-generated method stub
+        repository.save(new Employee(1001, "Arvind", "Developer"));
+        repository.save(new Employee(1002, "Surya", "Accountant"));
+    }
+
+}
+
+
+mysql> use trainingdb;
+Database changed
+mysql> show tables;
+
+
+mysql> select * from employee;
+
+
+@Override
+    public void run(String... args) throws Exception {
+        // TODO Auto-generated method stub
+        //repository.save(new Employee(1001, "Arvind", "Developer"));
+        //repository.save(new Employee(1002, "Surya", "Accountant"));
+        List<Employee> employees= repository.findAll();
+        employees.forEach(e->System.out.println(e.getId()+"\t"+e.getName()+"\t"+e.getDesignation()));
+    }
+
+
+
+https://drive.google.com/drive/folders/1S8ZemPGq03_smqgFzdWPSwWus6g6FfhQ?usp=sharing
+
